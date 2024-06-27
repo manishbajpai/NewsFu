@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/mbajpai/Documents/workspace/cnnlite/myenv"
+set -gx VIRTUAL_ENV "/Users/mbajpai/Documents/workspace/NewsFu/myenv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

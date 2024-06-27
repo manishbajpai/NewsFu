@@ -22,3 +22,4 @@ db_file = 'example.db'
 table_name = 'articles'
 new_column = 'category'
 add_column_to_table(db_file, table_name, new_column)
+#ALTER TABLE articles RENAME TO articles_v0;

@@ -35,7 +35,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS articles (
         date TEXT,
         link TEXT UNIQUE,
-        title TEXT
+        title TEXT,
+        category TEXT
     )
     ''')
     conn.commit()
@@ -59,7 +60,10 @@ def insert_data(url, title):
         #todo: log the url for future analysis
         return
 # Split the path into parts
-    parts = url.parts
+    path = Path(url)
+    parts = path.parts
+    if (len(parts) < 6):
+        return
     date = parts[1]+'-'+parts[2]+'-'+parts[3]
     category = parts[4]
     # Connect to SQLite database (or create it if it doesn't exist)
@@ -69,15 +73,15 @@ def insert_data(url, title):
     data = [
         (date, url, title, category),
         #(datetime.now().strftime('%Y-%m-%d'), url, title),
-
     ]
 
     # Insert data into the table
     try: 
-        c.executemany('INSERT INTO articles (date, link, title) VALUES (?, ?, ?)', data)
+        c.executemany('INSERT INTO articles (date, link, title, category) VALUES (?, ?, ?, ?)', data)
     except sqlite3.IntegrityError as e:
         #do nothing
-        print("dup")
+        #print("dup")
+        pass
 
     # Commit the insertions
     conn.commit()
