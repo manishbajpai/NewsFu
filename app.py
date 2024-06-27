@@ -4,32 +4,31 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-def get_articles_by_date(query_date):
+def get_articles_by_category(query_date):
     base_url = "https://lite.cnn.com/"  # Set the base URL
-
-    # Connect to the SQLite database
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
     
-    # Query for articles by date
-    c.execute("SELECT date, link, title FROM articles WHERE date LIKE ?", (f"{query_date}%",))
-    articles = []
-    for article in c.fetchall():
-        # Append the base URL to the link if it's a relative URL
-        link = article[1]
-        if link.startswith('/'):
-            link = base_url + link
-        articles.append((article[0], link, article[2]))
+    # Query to fetch all articles grouped by category
+    c.execute("SELECT date, link, title, category FROM articles WHERE date LIKE ? ORDER BY category", (f"{query_date}%",))
+    articles = c.fetchall()
+    
+    # Organize articles by category
+    categories = {}
+    for article in articles:
+        if article[3] not in categories:
+            categories[article[3]] = []
+        categories[article[3]].append(article)
     
     # Close the database connection
     conn.close()
-    return articles
+    return categories
 
 @app.route('/', methods=['GET'])
 def home():
     date_query = request.args.get('date', default=datetime.now().strftime('%Y-%m-%d'))
-    articles = get_articles_by_date(date_query)
-    return render_template('index.html', date=date_query, articles=articles)
+    categories = get_articles_by_category(date_query)
+    return render_template('index.html', date=date_query, categories=categories)
 
 if __name__ == '__main__':
     app.run(debug=True)
