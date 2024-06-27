@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Articles</title>
+</head>
+<body>
+    <h1>CNN Articles on {{ date }}</h1>
+    <form action="/" method="get">
+        <label for="date">Choose a date:</label>
+        <input type="date" id="date" name="date" value="{{ date }}" required>
+        <button type="submit">Submit</button>
+    </form>
+    <table border="0">
+        <tr>
+            <th>{{ date }}</th>
+        </tr>
+        {% for date, link, title in articles %}
+        <tr>
+            <td><a href="{{ link }}">{{ title }}</a></td> <!-- Combined link and title in one field -->
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
