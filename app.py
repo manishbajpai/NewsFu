@@ -18,7 +18,14 @@ def get_articles_by_category(query_date):
     for article in articles:
         if article[3] not in categories:
             categories[article[3]] = []
-        categories[article[3]].append(article)
+
+        link = article[1]
+
+        if link.startswith('/'):
+            link = base_url + link
+
+        updated = (article[0], link, article[2], article[3])
+        categories[article[3]].append(updated)
     
     # Close the database connection
     conn.close()
