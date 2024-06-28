@@ -59,7 +59,7 @@ def insert_data(url, title):
     if not is_unix_path(url):
         #todo: log the url for future analysis
         return
-# Split the path into parts
+    # Split the path into parts
     path = Path(url)
     parts = path.parts
     if (len(parts) < 6):
@@ -70,12 +70,8 @@ def insert_data(url, title):
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
     # Data to be inserted
-    data = [
-        (date, url, title, category),
-        #(datetime.now().strftime('%Y-%m-%d'), url, title),
-    ]
+    data = [(date, url, title, category),]
 
-    # Insert data into the table
     try: 
         c.executemany('INSERT INTO articles (date, link, title, category) VALUES (?, ?, ?, ?)', data)
     except sqlite3.IntegrityError as e:
@@ -83,9 +79,7 @@ def insert_data(url, title):
         #print("dup")
         pass
 
-    # Commit the insertions
     conn.commit()
-    # Close the connection to free the resources
     conn.close()
 
 main()
