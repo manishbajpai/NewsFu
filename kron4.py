@@ -32,6 +32,9 @@ def main():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     links = soup.find_all('a', href=lambda href: href and href.startswith('https://www.kron4.com/news/'))
+
+    total = 0
+    inserted = 0
     for link in links:
         url = link.get('href')
         text = link.text.strip()
@@ -42,7 +45,10 @@ def main():
             continue
         if not (parts[2] == 'bay-area' or parts[2] == 'california' or parts[2] == 'national'):
             continue
-        insert_data(url, text, parts[2])
+        total += 1
+        inserted += insert_data(url, text, parts[2])
+
+    print(f"Total: {total}, inserted: {inserted}, dup: {total - inserted} ")
 
 def init_db():
     # Connect to SQLite database (or create it if it doesn't exist)
@@ -59,25 +65,26 @@ def init_db():
     )
     ''')
     conn.commit()
-
     conn.close()
 
 def insert_data(url, title, category):
     
-    date = datetime.now().strftime('%Y-%m-%d')
+    date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     data = [(date, url, title, category),]
    
     # Connect to SQLite database (or create it if it doesn't exist)
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
-
+    inserted = 1
     try: 
         c.executemany('INSERT INTO kron4 (date, link, title, category) VALUES (?, ?, ?, ?)', data)
     except sqlite3.IntegrityError as e:
+        inserted = 0
         pass
 
     conn.commit()
     conn.close()
+    return inserted
 
 main()

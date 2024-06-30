@@ -19,11 +19,15 @@ def main():
     relative_links = soup.find_all('a', href=lambda href: href and href.startswith('/'))
 
     # Loop through each relative link, extract the URL and the text
+    total = 0
+    inserted = 0
     for link in relative_links:
         url = link.get('href')  # Extract the href attribute
         text = link.text.strip()  # Get the text content of the link, stripping any extra whitespace
         #print(f"URL: {url}, Text: {text}")
-        insert_data(url, text)
+        total +=1
+        inserted += insert_data(url, text)
+    print(f"Total: {total}, inserted: {inserted}, dup: {total - inserted} ")
 
 def init_db():
     # Connect to SQLite database (or create it if it doesn't exist)
@@ -58,13 +62,13 @@ def insert_data(url, title):
     #make sure we understand the relative URL.
     if not is_unix_path(url):
         #todo: log the url for future analysis
-        return
+        return 0
     # Split the path into parts
     path = Path(url)
     parts = path.parts
     if (len(parts) < 6):
-        return
-    date = parts[1]+'-'+parts[2]+'-'+parts[3]
+        return 0
+    date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     category = parts[4]
     # Connect to SQLite database (or create it if it doesn't exist)
     conn = sqlite3.connect('example.db')
@@ -72,14 +76,15 @@ def insert_data(url, title):
     # Data to be inserted
     data = [(date, url, title, category),]
 
+    inserted = 1
     try: 
         c.executemany('INSERT INTO articles (date, link, title, category) VALUES (?, ?, ?, ?)', data)
     except sqlite3.IntegrityError as e:
-        #do nothing
-        #print("dup")
+        inserted = 0
         pass
 
     conn.commit()
     conn.close()
+    return inserted
 
 main()

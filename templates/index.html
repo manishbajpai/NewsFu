@@ -6,8 +6,8 @@
     <title>Plain Vanilla News</title>
     <style>
         .dot {
-            height: 10px;
-            width: 10px;
+            height: 8px;
+            width: 8px;
             background-color: #2457e5;
             border-radius: 50%;
             display: inline-block;
@@ -31,13 +31,12 @@
     {% for category, articles in categories.items() %}
     <h2>{{ category }}</h2>
     <table>
-        {% for date, link, title, _ in articles %}
-
+        {% for date, link, title, cat, freshness in articles %}
         <tr>
             <td>
-                <span class="dot"></span>
+                {% if freshness in "new" %} <span class="dot"></span> {% endif %}
             </td>
-            <td><a href="{{ link }}">{{ title }}</a></td>
+            <td><a href="{{ link }}" target="_blank">{{ title }} </a></td>
         </tr>
         {% endfor %}
     </table>

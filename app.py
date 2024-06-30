@@ -1,16 +1,34 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-def get_cnn_by_category(query_date, categories):
+def set_visit_cookie(response):
+    expiry_date = datetime.now() + timedelta(days=30)  # Adjust expiry as needed
+    response.set_cookie('last_visit', datetime.now().isoformat(), expires=expiry_date)
+    return response
+
+def freshness(article_t, visit_t):
+     
+    if (len(article_t) <=10):
+        time_object = datetime.strptime(article_t, '%Y-%m-%d')
+    else:
+        time_object = datetime.strptime(article_t, '%Y-%m-%d %H:%M:%S')
+
+    
+    if (time_object > visit_t):
+        return "new"
+    else:
+        return "old"
+     
+def get_cnn_by_category(query_date, categories, last_visited):
     base_url = "https://lite.cnn.com/"  # Set the base URL
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
     
     # Query to fetch all articles grouped by category
-    c.execute("SELECT date, link, title, category FROM articles WHERE date LIKE ? ORDER BY category", (f"{query_date}%",))
+    c.execute("SELECT date, link, title, category FROM articles WHERE date(date) LIKE ? ORDER BY category", (f"{query_date}%",))
     articles = c.fetchall()
     
     # Organize articles by category
@@ -23,21 +41,20 @@ def get_cnn_by_category(query_date, categories):
 
         if link.startswith('/'):
             link = base_url + link
+        
+        updated = (article[0], link, article[2], cat, freshness(article[0], last_visited))
 
-        updated = (article[0], link, article[2], cat)
         categories[cat].append(updated)
     
-    # Close the database connection
     conn.close()
     return categories
 
-def get_kron4_by_category(query_date, categories):
-    base_url = "https://www.kron4.com/"  # Set the base URL
+def get_kron4_by_category(query_date, categories, last_visited):
+    base_url = "https://www.kron4.com/"
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
     
-    # Query to fetch all articles grouped by category
-    c.execute("SELECT date, link, title, category FROM kron4 WHERE date LIKE ? ORDER BY category", (f"{query_date}%",))
+    c.execute("SELECT date, link, title, category FROM kron4 WHERE date(date) LIKE ? ORDER BY category", (f"{query_date}%",))
     articles = c.fetchall()
     
     # Organize articles by category
@@ -48,22 +65,32 @@ def get_kron4_by_category(query_date, categories):
 
         link = article[1]
 
-        updated = (article[0], article[1], article[2], cat)
+        updated = (article[0], article[1], article[2], cat, freshness(article[0], last_visited))
+
         categories[cat].append(updated)
     
-    # Close the database connection
     conn.close()
     return categories
 
 @app.route('/', methods=['GET'])
 def home():
+    # Get the last visit timestamp from the cookie
+    last_visit_cookie = request.cookies.get('last_visit')
+    if last_visit_cookie:
+        last_visit = datetime.fromisoformat(last_visit_cookie)
+        #print(f"last visit: {last_visit}")
+    else:
+        last_visit = datetime.min  # Default to very old date if no cookie is set
+
     date_query = request.args.get('date', default=datetime.now().strftime('%Y-%m-%d'))
     categories = {}
 
-    get_cnn_by_category(date_query, categories)
-    get_kron4_by_category(date_query, categories)
+    get_cnn_by_category(date_query, categories, last_visit)
+    get_kron4_by_category(date_query, categories, last_visit)
+    
+    response = make_response(render_template('index.html', date=date_query, categories=categories))
 
-    return render_template('index.html', date=date_query, categories=categories)
+    return set_visit_cookie(response)
 
 @app.route('/settings')
 def settings():
