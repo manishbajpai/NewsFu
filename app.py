@@ -34,6 +34,11 @@ def get_cnn_by_category(query_date, categories, last_visited):
     # Organize articles by category
     for article in articles:
         cat = article[3].capitalize()
+        if cat == "Us":
+            cat = "US"
+        elif cat == "Middleeast":
+            cat = "Middle East"
+
         if cat not in categories:
             categories[cat] = []
 
@@ -60,6 +65,8 @@ def get_kron4_by_category(query_date, categories, last_visited):
     # Organize articles by category
     for article in articles:
         cat = article[3].capitalize()
+        if (cat == "National"):
+            cat = "US"
         if cat not in categories:
             categories[cat] = []
 

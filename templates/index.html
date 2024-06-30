@@ -13,6 +13,39 @@
             display: inline-block;
         }
     </style>
+    <style>
+        /* Default light theme */
+        body {
+            background-color: #ffffff;
+            color: black;
+        }
+    
+        table {
+            background-color: #f8f9fa;
+            color: black;
+        }
+    
+        a {
+            color: #007bff;
+        }
+    
+        /* Dark theme */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #202428;
+                color: #e0e0e0;
+            }
+    
+            table {
+                background-color: #202428;
+                color: #ffffff;
+            }
+    
+            a {
+                color: #4a8bec;
+            }
+        }
+    </style>
 </head>
 <body>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -22,10 +55,11 @@
     </a> <!-- Font Awesome icon for settings -->
 
     <h1>Plain Vanilla News</h1>
-    <form action="/" method="get">
+    <!-- Form to select a date -->
+    <form id="dateForm" action="/" method="get">
         <label for="date">Choose a date:</label>
-        <input type="date" id="date" name="date" value="{{ date }}" required>
-        <button type="submit">Submit</button>
+        <input type="date" id="date" name="date" value="{{ date }}" required onchange="submitForm()">
+        <noscript><button type="submit">Submit</button></noscript>
     </form>
 
     {% for category, articles in categories.items() %}
@@ -41,6 +75,12 @@
         {% endfor %}
     </table>
     {% endfor %}
+
+    <script>
+        function submitForm() {
+            document.getElementById("dateForm").submit();
+        }
+    </script>
 </body>
 </html>
 
