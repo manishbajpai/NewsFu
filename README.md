@@ -2,16 +2,15 @@
 News reporting: The way it should be
 
 ## What is it about?
-The news websites are often too busy looking, designed in a way to invite clickbaiting, ragebaiting etc. While some of the entries cover news, there are others which are far removed from actual news content and remain on the front page for a long time to attract user engagement. 
-This project envisions a simplified user interface that focuses on showing the news headlines from multiple sources you care about. We understand that people have different preferences about how they want to see the news and so we aim to provide customizations of look and feel per your taste.
+Many news websites today are cluttered with distracting designs, filled with clickbait and ragebait content. While some articles cover actual news, many others are irrelevant and linger on the front page to drive user engagement. This project envisions a clean and simplified user interface that prioritizes showing the latest headlines from multiple trusted sources, tailored to your preferences. We understand that people have different ways they like to consume news, so we offer customization options for the look and feel to suit your style.
 
 ## Development
-The development of this project is divided into two parts - update the database, and present the news. These two items are tied together via the uniform database schema shared between all news sources.
+The development of this project consists of two main components: updating the database and presenting the news. These components are connected through a standardized database schema that is shared across all news sources.
 
 ### Update the database
-In order to add a new source to the database, you need to create a script that fetches the said data and puts in a database. The script can be in any language you like. We are using python for now.
+To add a new news source, you'll need to create a script that fetches data from the source and stores it in the database. This script can be written in any programming language, though we are currently using Python for this task.
 
 ### Present the news
-This means fetching the links from the database and presenting them to the user based on their prefereces. This needs to be in python.
+This involves retrieving the relevant links from the database and displaying them to the user based on their preferences. This part of the project is also built using Python.
 
-If you have any questions, feel free to ask me by posting it on this project page in gitup: https://github.com/manishbajpai/NewsFu
+If you have any questions, feel free to reach out by posting on the project page on GitHub: https://github.com/manishbajpai/NewsFu.
