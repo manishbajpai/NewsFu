@@ -10,7 +10,7 @@ def sanitize(link):
     url = link.get('href')
     link['href'] = url.split('#')[0]
     text = link.text.strip()
-    if (text == '' or test == 'From The Newsroom'):
+    if (text == '' or text == 'From The Newsroom'):
         return []
     parts = PurePosixPath(unquote(urlparse(url).path)).parts
     if len(parts) < 3:
@@ -28,7 +28,7 @@ def test():
             if (sanitized):
                 print(link)
 
-def main(): 
+def update(): 
     url = 'https://www.ndtv.com/'
 
     init_db()
@@ -86,5 +86,11 @@ def insert_data(url, title, category):
     conn.close()
     return inserted
 
+def main():
+    import sys
+    if (len(sys.argv) > 1 and sys.argv[1] == "test"):
+        test()
+    else:
+        update()
+
 main()
-#test()
