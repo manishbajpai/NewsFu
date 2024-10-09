@@ -10,7 +10,7 @@ def sanitize(link):
     url = link.get('href')
     link['href'] = url.split('#')[0]
     text = link.text.strip()
-    if text == '':
+    if (text == '' or test == 'From The Newsroom'):
         return []
     parts = PurePosixPath(unquote(urlparse(url).path)).parts
     if len(parts) < 3:
@@ -39,28 +39,13 @@ def main():
 
     links = soup.find_all('a', href=lambda href: href and href.startswith('https://www.ndtv.com/india-news/'))
 
-    cleaned_links = []
-    for link in links:
-        href = link['href']
-        # Remove part after '#'
-        cleaned_href = href.split('#')[0]
-        cleaned_links.append(cleaned_href)
-    links = cleaned_links
-
     total = 0
     inserted = 0
     for link in links:
-        url = link.get('href')
-        text = link.text.strip()
-        if text == '':
-            continue
-        parts = PurePosixPath(unquote(urlparse(url).path)).parts
-        if len(parts) < 3:
-            continue
-        if not (parts[1] == 'india-news'):
-            continue
-        total += 1
-        inserted += insert_data(url, text, "India")
+        sanitized = sanitize(link)
+        if (sanitized): 
+            total += 1
+            inserted += insert_data(link.get('href'), link.text.strip(), "India")
 
     print(f"Total: {total}, inserted: {inserted}, dup: {total - inserted} ")
 
@@ -101,5 +86,5 @@ def insert_data(url, title, category):
     conn.close()
     return inserted
 
-#main()
-test()
+main()
+#test()
