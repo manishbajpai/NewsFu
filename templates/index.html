@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plain Vanilla News</title>
+    <title>Breaking News</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
     <style>
         .dot {
             height: 8px;
@@ -14,6 +18,11 @@
         }
     </style>
     <style>
+        .source {
+            font-size: .5em;
+        }
+    </style>
+    <style>
         /* Default light theme */
         body {
             background-color: #ffffff;
@@ -21,13 +30,13 @@
         }
     
         table {
-            background-color: #f8f9fa;
+            background-color: #ffffff;
             color: black;
         }
     
-        a {
-            color: #007bff;
-        }
+        /*a {
+            color: #072443;
+        }*/
     
         /* Dark theme */
         @media (prefers-color-scheme: dark) {
@@ -41,9 +50,9 @@
                 color: #ffffff;
             }
     
-            a {
+            /* a {
                 color: #4a8bec;
-            }
+            } */
         }
     </style>
 </head>
@@ -54,7 +63,7 @@
         <i class="fas fa-cog"></i>
     </a> <!-- Font Awesome icon for settings -->
 
-    <h1>Plain Vanilla News</h1>
+    <h1>Breaking News</h1>
     <!-- Form to select a date -->
     <form id="dateForm" action="/" method="get">
         <label for="date">Choose a date:</label>
@@ -65,12 +74,12 @@
     {% for category, articles in categories.items() %}
     <h2>{{ category }}</h2>
     <table>
-        {% for date, link, title, cat, freshness in articles %}
+        {% for date, link, title, cat, freshness, source in articles %}
         <tr>
             <td>
                 {% if freshness in "new" %} <span class="dot"></span> {% endif %}
             </td>
-            <td><a href="{{ link }}" target="_blank">{{ title }} </a></td>
+            <td>{{ title }}<a href="{{ link }}" target="_blank"> <span class="source">{{ source }}</span></a></td>
         </tr>
         {% endfor %}
     </table>

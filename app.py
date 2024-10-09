@@ -23,7 +23,7 @@ def freshness(article_t, visit_t):
         return "old"
      
 def get_cnn_by_category(query_date, categories, last_visited):
-    base_url = "https://lite.cnn.com/"  # Set the base URL
+    base_url = "https://lite.cnn.com"  # Set the base URL
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
     
@@ -38,6 +38,14 @@ def get_cnn_by_category(query_date, categories, last_visited):
             cat = "US"
         elif cat == "Middleeast":
             cat = "Middle East"
+        elif cat == "Climate":
+            cat = "Weather"
+        elif cat == "Uk" or cat.startswith('Uk-'):
+            cat = "Europe"
+        elif cat == 'Style' or cat == 'Media' or cat == 'Entertainment' or cat == 'Food':
+            cat = 'Page 3'
+        elif cat == 'Economy' or cat == 'Investing':
+            cat = 'Business' 
 
         if cat not in categories:
             categories[cat] = []
@@ -47,7 +55,7 @@ def get_cnn_by_category(query_date, categories, last_visited):
         if link.startswith('/'):
             link = base_url + link
         
-        updated = (article[0], link, article[2], cat, freshness(article[0], last_visited))
+        updated = (article[0], link, article[2], cat, freshness(article[0], last_visited), "[CNN]")
 
         categories[cat].append(updated)
     
@@ -67,12 +75,41 @@ def get_kron4_by_category(query_date, categories, last_visited):
         cat = article[3].capitalize()
         if (cat == "National"):
             cat = "US"
+        elif cat == "Bay-area":
+            cat = 'SF Bay Area'
         if cat not in categories:
             categories[cat] = []
 
         link = article[1]
 
-        updated = (article[0], article[1], article[2], cat, freshness(article[0], last_visited))
+        updated = (article[0], article[1], article[2], cat, freshness(article[0], last_visited), "[KRON4]")
+
+        categories[cat].append(updated)
+    
+    conn.close()
+    return categories
+
+def get_ndtv_by_category(query_date, categories, last_visited):
+    base_url = "https://www.ndtv.com/"
+    conn = sqlite3.connect('example.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT date, link, title, category FROM ndtv WHERE date(date) LIKE ? ORDER BY category", (f"{query_date}%",))
+    articles = c.fetchall()
+    
+    # Organize articles by category
+    for article in articles:
+        cat = article[3].capitalize()
+        if (cat == "National"):
+            cat = "US"
+        elif cat == "Bay-area":
+            cat = 'SF Bay Area'
+        if cat not in categories:
+            categories[cat] = []
+
+        link = article[1]
+
+        updated = (article[0], article[1], article[2], cat, freshness(article[0], last_visited), "[NDTV]")
 
         categories[cat].append(updated)
     
@@ -94,6 +131,7 @@ def home():
 
     get_cnn_by_category(date_query, categories, last_visit)
     get_kron4_by_category(date_query, categories, last_visit)
+    get_ndtv_by_category(date_query, categories, last_visit)
     
     response = make_response(render_template('index.html', date=date_query, categories=categories))
 

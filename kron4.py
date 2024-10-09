@@ -1,10 +1,12 @@
-import requests
+#import requests
+from curl_cffi import requests
 from bs4 import BeautifulSoup
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from pathlib import PurePosixPath
+#from hyper.contrib import HTTP20Adapter
 
 def test():
     with open('downloads/kron4.index.html') as f:
@@ -20,13 +22,38 @@ def test():
                 continue
             if not (parts[2] == 'bay-area' or parts[2] == 'california' or parts[2] == 'national'):
                 continue
+            if parts[3] == 'watch-news-live':
+                continue
             print(f"{parts[2]}, {parts[3]}, {text}")
 
-def main(): 
-    url = 'https://www.kron4.com/'
 
+def main(): 
+
+    url = 'https://www.kron4.com/'
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:127.0) Gecko/20100101 Firefox/127.0', 'Accept': '*/*', 'referer':'https://www.google.com/'}
+
+    #, 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+# 'Accept-Language': 'en-US,en;q=0.5',
+# 'Accept-Encoding': 'gzip, deflate, br, zstd',
+# 'DNT': '1',
+# 'Sec-GPC': '1',
+# 'Connection': 'keep-alive',
+# 'Upgrade-Insecure-Requests': '1',
+# 'Sec-Fetch-Dest': 'document',
+# 'Sec-Fetch-Mode': 'navigate',
+# 'Sec-Fetch-Site': 'none',
+# 'Sec-Fetch-User': '?1',
+# 'Priority': 'u=1'}
     init_db()
-    response = requests.get(url)
+    #response = requests.get(url, headers=headers)
+    response = requests.get(url, impersonate="chrome110")
+
+    # session = requests.Session()
+    # session.mount("https://", HTTP20Adapter())
+    # response = session.get(url, headers=headers)
+
+    #print(response.request.headers)
+
     response.raise_for_status()  # This will raise an exception if there was an error fetching the page
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -38,12 +65,14 @@ def main():
     for link in links:
         url = link.get('href')
         text = link.text.strip()
-        if text == '':
+        if text == '' or text == "Top Story":
             continue
         parts = PurePosixPath(unquote(urlparse(url).path)).parts
         if len(parts) < 4:
             continue
         if not (parts[2] == 'bay-area' or parts[2] == 'california' or parts[2] == 'national'):
+            continue
+        if parts[3] == 'watch-news-live':
             continue
         total += 1
         inserted += insert_data(url, text, parts[2])
