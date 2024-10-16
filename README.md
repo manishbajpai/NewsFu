@@ -5,8 +5,8 @@ News reporting: The way it should be
 Many news websites today are cluttered with distracting designs, filled with clickbait and ragebait content. While some articles cover actual news, many others are irrelevant and linger on the front page to drive user engagement. This project envisions a clean and simplified user interface that prioritizes showing the latest headlines from multiple trusted sources, tailored to your preferences. We understand that people have different ways they like to consume news, so we offer customization options for the look and feel to suit your style.
 
 ## Run
-```bash
-Python3 -m venv venv
+``` bash
+python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
 python3 app.py
