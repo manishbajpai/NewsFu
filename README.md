@@ -11,7 +11,7 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 python3 app.py
 ```
-Now point your browser to [http://localhost:5001/](http://localhost:5001/) or whatever url is prited by app.py
+Now point your browser to [http://localhost:5001/](http://localhost:5001/) or whatever url is printed by app.py
 
 ## Development
 The development of this project consists of two main components: updating the database and presenting the news. These components are connected through a standardized database schema that is shared across all news sources.
